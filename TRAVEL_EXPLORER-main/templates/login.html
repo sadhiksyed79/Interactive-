@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Travel Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #000;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    header.navbar {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      background-color: #000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      margin-right: 10px;
+    }
+
+    .navbar h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: #ffffff;
+    }
+
+    .navbar nav a {
+      background-color: #007BFF;
+      color: #ffffff;
+      padding: 10px 18px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      margin-left: 15px;
+    }
+
+    .navbar nav a:hover {
+      background-color: #339CFF;
+      transform: scale(1.05);
+    }
+
+    .login-container {
+      margin: 150px auto 0;
+      padding: 2rem;
+      background: rgba(17, 17, 17, 0.9);
+      border-radius: 16px;
+      max-width: 420px;
+      width: 90%;
+      z-index: 10;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0, 174, 255, 0.6), 0 0 60px rgba(0, 174, 255, 0.3);
+      animation: pulseGlow 4s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 30px rgba(0, 174, 255, 0.5), 0 0 60px rgba(0, 174, 255, 0.2);
+      }
+      50% {
+        box-shadow: 0 0 50px rgba(0, 174, 255, 0.8), 0 0 80px rgba(0, 174, 255, 0.4);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      color: #339CFF;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0 0.3rem;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background-color: #222;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .show-password {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #bbb;
+      margin-bottom: 1rem;
+    }
+
+    .show-password input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+
+    #error-message {
+      display: none;
+      background-color: #ff3b3b;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(to right, #007BFF, #339CFF);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #005ecb, #228be6);
+    }
+
+    .signup {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .signup a {
+      color: #339CFF;
+      text-decoration: none;
+    }
+
+    .signup a:hover {
+      text-decoration: underline;
+    }
+
+    .rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .drop {
+      position: absolute;
+      bottom: 100%;
+      width: 2px;
+      height: 15px;
+      background: rgba(255, 255, 255, 0.3);
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .login-container {
+        margin-top: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Rain -->
+  <div class="rain" id="rain"></div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo-section">
+      <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" alt="Travel Logo" class="logo">
+      <h1>Travel Explorer</h1>
+    </div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+    </nav>
+  </header>
+
+  <!-- Login Form -->
+  <div class="login-container">
+    <h2>Login to Travel Explorer</h2>
+    <form onsubmit="handleLogin(event)">
+      <label for="username">Username or Email</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+
+      <div class="show-password">
+        <input type="checkbox" id="togglePassword" onclick="togglePasswordVisibility()">
+        <label for="togglePassword">Show Password</label>
+      </div>
+
+      <div id="error-message">Invalid username or password. Please try again.</div>
+
+      <button type="submit">Login</button>
+
+      <div class="signup">
+        <p>Don't have an account? <a href="register">Sign up</a></p>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    async function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('error-message');
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem('username', result.username || username);
+          window.location.href = 'welcome';
+        } else {
+          errorMsg.textContent = result.error || 'Login failed.';
+          errorMsg.style.display = 'block';
+        }
+      } catch (error) {
+        console.error('Login Error:', error);
+        errorMsg.textContent = 'Server error. Please try again later.';
+        errorMsg.style.display = 'block';
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    }
+
+    // Create raindrops
+    const rainContainer = document.getElementById('rain');
+    for (let i = 0; i < 100; i++) {
+      const drop = document.createElement('div');
+      drop.classList.add('drop');
+      drop.style.left = `${Math.random() * 100}%`;
+      drop.style.animationDuration = `${Math.random() * 2 + 1}s`;
+      rainContainer.appendChild(drop);
+    }
+  </script>
+</body>
+</html>

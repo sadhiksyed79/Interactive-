@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Explorer - Animated Hero</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Roboto&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    /* Navbar styles */
+    .navbar {
+      position: fixed;
+      width: 100%;
+      top: -100px;
+      left: 0;
+      background-color: #000000;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      animation: slideDown 1s ease-out forwards;
+      box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+    }
+
+    @keyframes slideDown {
+      to {
+        top: 0;
+      }
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      margin-right: 10px;
+    }
+
+    .navbar h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      margin: 0;
+      color: #ffffff;
+    }
+
+    .navbar nav a {
+      background-color: #007BFF;
+      color: #ffffff;
+      padding: 10px 18px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      margin-left: 15px;
+      display: inline-block;
+    }
+
+    .navbar nav a:hover {
+      background-color: #339CFF;
+      transform: scale(1.05);
+    }
+
+    /* Hero section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      background-color: #000000;
+      margin-top: 80px;
+    }
+
+    .hero-text {
+      flex: 1;
+      padding: 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-text h2 {
+      font-size: 2.8rem;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .hero-text h2::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 4px;
+      background-color: #007BFF;
+      margin-top: 10px;
+      border-radius: 2px;
+    }
+
+    .hero-text p {
+      font-size: 1.2rem;
+      color: #cccccc;
+      max-width: 500px;
+      margin-bottom: 30px;
+    }
+
+    .hero-text .btn {
+      background-color: #007BFF;
+      color: #ffffff;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      width: fit-content;
+      font-weight: bold;
+    }
+
+    .hero-text .btn:hover {
+      background-color: #339CFF;
+      transform: scale(1.05);
+    }
+
+    .hero-globe {
+      flex: 1;
+      position: relative;
+    }
+
+    #globeCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .hero-text, .hero-globe {
+        width: 100%;
+        flex: none;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .hero-text h2 {
+        font-size: 2rem;
+      }
+
+      .hero-text .btn {
+        margin: 0 auto;
+      }
+
+      .navbar {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo-section">
+      <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" alt="Travel Logo" class="logo">
+      <h1>Travel Explorer</h1>
+    </div>
+    <nav>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/login">Login</a>
+      </nav>
+      
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h2>Explore the World</h2>
+      <p>Travel Explorer helps you discover the most amazing places on Earth. Whether you're planning your next adventure or just dreaming of far-off lands, we've got the inspiration and guides to fuel your journey.</p>
+      <button class="btn" onclick="window.location.href='login'">Get Started</button>
+    </div>
+    <div class="hero-globe">
+      <canvas id="globeCanvas"></canvas>
+    </div>
+  </section>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+
+  <!-- Globe Script -->
+  <script>
+    const canvas = document.getElementById("globeCanvas");
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      canvas.clientWidth / canvas.clientHeight,
+      0.1,
+      1000
+    );
+    camera.position.z = 4;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    const blueLight = new THREE.PointLight(0x007BFF, 2, 10);
+    blueLight.position.set(2, 2, 2);
+    scene.add(ambientLight, blueLight);
+
+    const geometry = new THREE.SphereGeometry(1.5, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
+
+    textureLoader.load(
+      'https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg',
+      (texture) => {
+        const material = new THREE.MeshStandardMaterial({ map: texture });
+        const globe = new THREE.Mesh(geometry, material);
+        scene.add(globe);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          globe.rotation.y += 0.002;
+          renderer.render(scene, camera);
+        }
+
+        animate();
+      },
+      undefined,
+      (err) => {
+        console.error('Failed to load texture.', err);
+      }
+    );
+
+    window.addEventListener('resize', () => {
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height, false);
+    });
+  </script>
+</body>
+</html>

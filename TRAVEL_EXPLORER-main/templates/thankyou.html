@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Thank You</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+      overflow: hidden;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      position: relative;
+    }
+
+    .stars, .stars2, .stars3 {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-repeat: repeat;
+      background-position: 0 0;
+      z-index: 0;
+    }
+
+    .stars {
+      background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/img/stars.png');
+      animation: moveStars 200s linear infinite;
+      opacity: 0.7;
+    }
+
+    .stars2 {
+      background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/img/stars.png');
+      animation: moveStars 300s linear infinite;
+      opacity: 0.5;
+    }
+
+    .stars3 {
+      background-image: url('https://raw.githubusercontent.com/VincentGarreau/particles.js/master/demo/img/stars.png');
+      animation: moveStars 400s linear infinite;
+      opacity: 0.3;
+    }
+
+    @keyframes moveStars {
+      0% { background-position: 0 0; }
+      100% { background-position: -10000px 5000px; }
+    }
+
+    .thank-you-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      text-align: center;
+      max-width: 500px;
+      animation: slideUp 1s ease-out, glow 5s ease-in-out infinite alternate;
+      z-index: 2;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 20px #00c6ff; }
+      100% { box-shadow: 0 0 40px #0072ff; }
+    }
+
+    .thank-you-container h1 {
+      font-size: 2.4em;
+      margin-bottom: 10px;
+      color: #ffffff;
+    }
+
+    .thank-you-container p {
+      font-size: 1.1em;
+      margin-bottom: 30px;
+      color: #d8d8d8;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .button-group button {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .visit-btn {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+    }
+
+    .visit-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 198, 255, 0.7);
+    }
+
+    .logout-btn {
+      background: linear-gradient(to right, #fc6076, #ff9a44);
+      color: white;
+    }
+
+    .logout-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(252, 96, 118, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+  <div class="stars2"></div>
+  <div class="stars3"></div>
+
+  <div class="thank-you-container">
+    <h1>Thanks for exploring with us! 🌌</h1>
+    <p>We hope your journey was as magical as the stars above. See you again!</p>
+    <div class="button-group">
+      <button class="visit-btn" onclick="window.location.href='/welcome'">✨ Visit More Places</button>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = "/logout";
+    }
+  </script>
+</body>
+</html>

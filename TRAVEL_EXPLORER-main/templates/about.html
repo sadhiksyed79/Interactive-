@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}About - Travel Explorer{% endblock %}
+
+{% block content %}
+<style>
+  /* Navbar styles */
+  .navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #000;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.2);
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo {
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+  }
+
+  .navbar h1 {
+    font-size: 24px;
+    color: #fff;
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .navbar nav a {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .navbar nav a:hover {
+    background-color: #339CFF;
+    transform: scale(1.05);
+  }
+
+  /* About section */
+  .about-section {
+    min-height: calc(100vh - 80px);
+    padding: 2rem 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #eee;
+    text-align: center;
+    padding-top: 100px;
+  }
+
+  .about-title {
+    font-size: 2.4rem;
+    color: #339CFF;
+    margin-bottom: 1rem;
+  }
+
+  .about-description {
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #ccc;
+  }
+
+  .feature-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .feature-box {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 260px;
+    box-shadow: 0 0 20px rgba(0, 174, 255, 0.3);
+    transition: transform 0.3s ease;
+  }
+
+  .feature-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(0, 174, 255, 0.5);
+  }
+
+  .feature-box strong {
+    display: block;
+    font-size: 1.05rem;
+    color: #00aaff;
+    margin-bottom: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .feature-box {
+      width: 100%;
+      max-width: 90%;
+    }
+
+    .about-title {
+      font-size: 2rem;
+    }
+
+    .navbar {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>
+
+<!-- Navbar -->
+<header class="navbar">
+  <div class="logo-section">
+    <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" alt="Travel Logo" class="logo">
+    <h1>Travel Explorer</h1>
+  </div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/login">Login</a>
+  </nav>
+</header>
+
+<!-- About Section -->
+<section class="about-section">
+  <h1 class="about-title">About Travel Explorer</h1>
+  <p class="about-description">
+    Travel Explorer helps you plan your perfect adventure with ease. Discover temples, parks, cities, and natural escapes — all tailored just for you!
+  </p>
+
+  <div class="feature-grid">
+    <div class="feature-box">
+      <strong>Personalized Travel Type</strong>
+      Choose from City, Nature, Adventure, or Relaxation.
+    </div>
+    <div class="feature-box">
+      <strong>Location-Aware Suggestions</strong>
+      Get recommendations based on your current location and travel mood.
+    </div>
+    <div class="feature-box">
+      <strong>Distance-Based Sorting</strong>
+      See the nearest attractions first and explore smartly.
+    </div>
+    <div class="feature-box">
+      <strong>Map/List View</strong>
+      Switch easily between a dynamic map or a list format.
+    </div>
+    <div class="feature-box">
+      <strong>Track Visits</strong>
+      Automatically log places you’ve visited and track progress.
+    </div>
+    <div class="feature-box">
+      <strong>Repeat Until Explored</strong>
+      Explore until everything nearby is visited or new places are found.
+    </div>
+    <div class="feature-box">
+      <strong>Smart Feedback</strong>
+      Rate places and give suggestions to improve your experience.
+    </div>
+  </div>
+</section>
+{% endblock %}

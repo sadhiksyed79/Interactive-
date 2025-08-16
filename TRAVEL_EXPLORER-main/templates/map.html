@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Map Explorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #f5f5f5;
+      color: #333;
+    }
+    #sidebar {
+      width: 320px;
+      padding: 20px;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      border-right: 2px solid #444;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    #places-title {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .place-item {
+      padding: 15px;
+      background: #2c2c2c;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    .place-item:hover {
+      background-color: #3a3a3a;
+    }
+    .place-item h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+    }
+    .place-item p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: #ddd;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      font-weight: 600;
+      transition: background 0.2s ease-in-out;
+    }
+    button:hover {
+      background-color: #43a047;
+    }
+    #start-button {
+      background-color: #03a9f4;
+    }
+    #start-button:hover {
+      background-color: #0288d1;
+    }
+    #place-details button {
+      background: #2196f3;
+      margin-top: 10px;
+    }
+    #route-mode {
+      margin-bottom: 10px;
+    }
+    #top-buttons {
+      margin-top: auto;
+    }
+    #map {
+      flex: 1;
+      height: 100%;
+      background-color: #121212;
+      position: relative;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="sidebar">
+  <h2 id="places-title">Places Nearby</h2>
+  <div id="route-mode">
+    <label><input type="radio" name="mode" value="walking" checked> Walk</label>
+    <label><input type="radio" name="mode" value="driving"> Drive</label>
+  </div>
+  <div id="results"></div>
+  <div id="place-details"></div>
+  <div id="top-buttons">
+    <button onclick="window.location.href='places'">📁 View Saved Places</button>
+    <button onclick="window.location.href='welcome'">← Back</button>
+  </div>
+</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const lat = parseFloat(urlParams.get('lat'));
+  const lon = parseFloat(urlParams.get('lon'));
+  const type = urlParams.get('type');
+  const username = localStorage.getItem("username") || "explorer";
+
+  if (!lat || !lon || !type) {
+    alert("Location or type missing. Please go back to welcome page.");
+    window.location.href = 'welcome';
+  }
+
+  let map = L.map('map').setView([lat, lon], 13);
+  let markersGroup = L.featureGroup().addTo(map);
+  let routingControl = null;
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  function speak(text) {
+    const speech = new SpeechSynthesisUtterance(text);
+    speech.lang = 'en-US';
+    window.speechSynthesis.speak(speech);
+  }
+
+  function haversineDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2)**2;
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  }
+
+  function drawRoute(toLat, toLon, routeBtn) {
+    if (routingControl) map.removeControl(routingControl);
+
+    const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+    const profile = selectedMode === 'walking' ? 'foot' : 'car';
+
+    const detailsDiv = document.getElementById('place-details');
+    const loadingMsg = document.createElement('p');
+    loadingMsg.id = 'loading-message';
+    loadingMsg.textContent = '⏳ Route is loading...';
+    detailsDiv.appendChild(loadingMsg);
+
+    routingControl = L.Routing.control({
+      waypoints: [L.latLng(lat, lon), L.latLng(toLat, toLon)],
+      router: L.Routing.osrmv1({ profile }),
+      routeWhileDragging: false
+    })
+    .on('routesfound', function () {
+      const msg = document.getElementById('loading-message');
+      if (msg) msg.remove();
+    })
+    .addTo(map);
+
+    if (routeBtn) routeBtn.style.display = 'none';
+  }
+
+  function saveToFavorites(place) {
+    let saved = JSON.parse(localStorage.getItem("favorites") || "[]");
+    saved.push(place);
+    localStorage.setItem("favorites", JSON.stringify(saved));
+    alert(`${place.name} added to favorites!`);
+  }
+
+  function showPlaceDetails(place) {
+    document.getElementById("results").style.display = "none";
+    document.getElementById("places-title").textContent = "Selected Place";
+    markersGroup.clearLayers();
+    L.marker([place.lat, place.lon]).addTo(markersGroup).bindPopup(place.name).openPopup();
+
+    const detailsDiv = document.getElementById('place-details');
+    detailsDiv.innerHTML = `<h3>${place.name}</h3><p>Loading weather info...</p>`;
+
+    fetch(`https://wttr.in/${place.lat},${place.lon}?format=j1`)
+      .then(res => res.json())
+      .then(data => {
+        const weather = data.current_condition?.[0];
+        const temp = weather?.temp_C + "°C";
+        const condition = weather?.weatherDesc?.[0]?.value?.toLowerCase() || "Unknown";
+        const wind = weather?.windspeedKmph + " km/h";
+        const humidity = weather?.humidity + "%";
+
+        let alertMessage = "";
+        const isRainy = condition.includes("rain");
+        const isBeach = type === 'beach';
+
+        const speakText = `Hello ${username}. You have selected ${place.name}. Weather is ${condition}, temperature is ${temp}, wind speed is ${wind}.`;
+
+        let detailsHTML = `
+          <h3>${place.name}</h3>
+          <p><strong>Coordinates:</strong> ${place.lat}, ${place.lon}</p>
+          <p><strong>Weather:</strong> ${condition}</p>
+          <p><strong>Temperature:</strong> ${temp}</p>
+          <p><strong>Wind:</strong> ${wind}</p>
+          <p><strong>Humidity:</strong> ${humidity}</p>
+          <button id="route-btn">Route</button>
+          <button onclick='saveToFavorites(${JSON.stringify(place)})'>Add to Favorites</button>
+        `;
+
+        if (isBeach && isRainy) {
+          alertMessage = `⚠ RED ALERT: It is rainy at the beach! Be cautious.`;
+          detailsHTML = `
+            <div style="background:#ff4444; color:white; padding:10px; border-radius:8px; font-weight:bold; margin-bottom:10px;">
+              ${alertMessage}
+            </div>` + detailsHTML;
+          speak(`${speakText} Red alert. It is rainy at the beach. Be cautious.`);
+        } else {
+          speak(speakText);
+        }
+
+        detailsDiv.innerHTML = detailsHTML;
+
+        document.getElementById("route-btn").onclick = function () {
+          drawRoute(place.lat, place.lon, this);
+        };
+      });
+  }
+
+  function searchOverpass(key, value) {
+    const query = `
+      [out:json][timeout:25];
+      (
+        node["${key}"="${value}"](around:50000,${lat},${lon});
+        way["${key}"="${value}"](around:50000,${lat},${lon});
+        relation["${key}"="${value}"](around:50000,${lat},${lon});
+      );
+      out center;
+    `;
+    fetch("https://overpass-api.de/api/interpreter", {
+      method: "POST",
+      body: query
+    })
+    .then(res => res.json())
+    .then(json => {
+      const places = json.elements.map(el => {
+        const eLat = el.lat || el.center?.lat;
+        const eLon = el.lon || el.center?.lon;
+        return {
+          lat: eLat,
+          lon: eLon,
+          name: el.tags?.name || "Unnamed Place",
+          distance: haversineDistance(lat, lon, eLat, eLon)
+        };
+      }).filter(p => p.lat && p.lon);
+      places.sort((a, b) => a.distance - b.distance);
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      resultsDiv.style.display = "block";
+      places.forEach(place => {
+        const item = document.createElement('div');
+        item.className = 'place-item';
+        item.innerHTML = `<strong>${place.name}</strong><br>📍 ${place.distance.toFixed(1)} km`;
+        item.onclick = () => showPlaceDetails(place);
+        resultsDiv.appendChild(item);
+        L.marker([place.lat, place.lon]).addTo(markersGroup).bindPopup(place.name);
+      });
+      map.fitBounds(markersGroup.getBounds(), { padding: [50, 50] });
+      window.availablePlaces = places;
+    });
+  }
+
+  if (type === 'beach') searchOverpass('natural', 'beach');
+  else if (type === 'temple') searchOverpass('amenity', 'place_of_worship');
+  else if (type === 'park') searchOverpass('leisure', 'park');
+  else if (type === 'historical') searchOverpass('historic', 'yes');
+
+  let userMarker = null;
+  let watchId = null;
+
+  function checkVisitedPlaces(latNow, lonNow) {
+    if (!window.availablePlaces) return;
+    let visited = JSON.parse(localStorage.getItem("visited") || "[]");
+    window.availablePlaces.forEach(place => {
+      const distance = haversineDistance(latNow, lonNow, place.lat, place.lon) * 1000;
+      const alreadyVisited = visited.find(v => v.name === place.name);
+      if (distance < 50 && !alreadyVisited) {
+        visited.push({ ...place, time: new Date().toLocaleString() });
+      }
+    });
+    localStorage.setItem("visited", JSON.stringify(visited));
+  }
+
+  function startLiveTracking() {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+    watchId = navigator.geolocation.watchPosition(
+      position => {
+        const { latitude, longitude } = position.coords;
+        if (userMarker) {
+          userMarker.setLatLng([latitude, longitude]);
+        } else {
+          userMarker = L.marker([latitude, longitude], {
+            icon: L.icon({
+              iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+              iconAnchor: [12, 41]
+            })
+          }).addTo(map).bindPopup("You are here").openPopup();
+        }
+        map.setView([latitude, longitude]);
+        checkVisitedPlaces(latitude, longitude);
+      },
+      error => console.error("Error watching position:", error),
+      { enableHighAccuracy: true, maximumAge: 10000 }
+    );
+  }
+
+  startLiveTracking();
+</script>
+</body>
+</html>

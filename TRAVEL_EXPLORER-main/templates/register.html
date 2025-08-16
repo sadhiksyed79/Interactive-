@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register | Travel Explorer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: radial-gradient(circle at 20% 20%, rgba(0, 123, 255, 0.15), transparent 50%),
+                  radial-gradient(circle at 80% 30%, rgba(0, 255, 255, 0.1), transparent 60%),
+                  radial-gradient(circle at 50% 80%, rgba(0, 123, 255, 0.1), transparent 50%);
+      animation: shimmer 10s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 0% 0%;
+      }
+      100% {
+        background-position: 100% 100%;
+      }
+    }
+
+    nav {
+      background-color: #000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+      z-index: 2;
+      position: relative;
+    }
+
+    .logo a {
+      color: #fff;
+      font-size: 1.5rem;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .nav-links a {
+      background: linear-gradient(to right, #007BFF, #339CFF);
+      color: white;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: background 0.3s, transform 0.2s;
+      display: inline-block;
+    }
+
+    .nav-links a:hover {
+      background: linear-gradient(to right, #005ecb, #228be6);
+      transform: scale(1.05);
+    }
+
+    .register-container {
+      margin: auto;
+      padding: 2.5rem;
+      background: rgba(17, 17, 17, 0.98);
+      border: 1px solid #1f1f1f;
+      border-radius: 14px;
+      max-width: 420px;
+      width: 90%;
+      position: relative;
+      z-index: 2;
+      box-shadow:
+        0 0 30px rgba(0, 153, 255, 0.45),
+        0 0 50px rgba(0, 123, 255, 0.35),
+        0 0 80px rgba(0, 123, 255, 0.25);
+      transition: box-shadow 0.4s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      color: #339CFF;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin: 0.5rem 0 0.3rem;
+      color: #ccc;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background-color: #222;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(to right, #007BFF, #339CFF);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #005ecb, #228be6);
+    }
+
+    .login {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .login a {
+      color: #339CFF;
+      text-decoration: none;
+    }
+
+    .login a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="animated-bg"></div>
+
+  <nav>
+    <div class="logo">
+      <a href="index">🌍 Travel Explorer</a>
+    </div>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="about">About</a>
+    </div>
+  </nav>
+
+  <div class="register-container">
+    <h2>Create Your Account</h2>
+    <form onsubmit="handleRegister(event)">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+
+      <button type="submit">Register</button>
+
+      <div class="login">
+        <p>Already have an account? <a href="login">Login here</a></p>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    async function handleRegister(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          alert("Registration successful!");
+          window.location.href = "login";
+        } else {
+          alert(result.error || "Registration failed.");
+        }
+      } catch (error) {
+        alert("Something went wrong. Try again later.");
+        console.error(error);
+      }
+    }
+  </script>
+</body>
+</html>

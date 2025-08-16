@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome to Travel Explorer</title>
+  <style>
+    @keyframes glowBackground {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #1c1c1c);
+      background-size: 400% 400%;
+      animation: glowBackground 10s ease infinite;
+      color: #e0e0e0;
+      text-align: center;
+      padding: 30px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      background-color: rgba(20, 20, 20, 0.85);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+      padding: 40px 30px;
+      border-radius: 20px;
+      display: inline-block;
+      transition: all 0.3s ease-in-out;
+      margin-top: 30px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      color: #00f0ff;
+      text-shadow: 0 0 10px #00f0ff;
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    select, button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      margin: 12px;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    select {
+      background-color: #111;
+      color: #fff;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+    }
+
+    select option {
+      background-color: #000;
+      color: #fff;
+    }
+
+    select option:checked {
+      background-color: #00f0ff !important;
+      color: #000 !important;
+    }
+
+    select:focus {
+      outline: none;
+      background-color: #00f0ff;
+      color: #000;
+    }
+
+    button {
+      cursor: pointer;
+      color: #fff;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.2);
+    }
+
+    #useLocationBtn {
+      background-color: #28a745;
+      text-shadow: 0 0 5px #28a745;
+    }
+
+    #exploreBtn {
+      background-color: #ff4f00;
+      text-shadow: 0 0 5px #ff4f00;
+    }
+
+    button:hover {
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+      transform: scale(1.05);
+    }
+
+    .error {
+      margin-top: 15px;
+      color: #ffb3b3;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to Travel Explorer</h1>
+    <p>Select the type of places you're interested in:</p>
+
+    <select id="placeType">
+      <option value="">-- Choose a type --</option>
+      <option value="beach">Beaches</option>
+      <option value="temple">Temples</option>
+      <option value="museum">Museums</option>
+      <option value="park">Parks</option>
+    </select><br/>
+
+    <button id="useLocationBtn" onclick="getLocation()">📍 Use My Current Location</button><br/>
+    <button id="exploreBtn" onclick="startExploring()">Explore Nearby Places</button><br/>
+
+    <p class="error" id="errorMsg"></p>
+  </div>
+
+  <script>
+    let userLat = null;
+    let userLon = null;
+
+    function getLocation() {
+      const errorMsg = document.getElementById("errorMsg");
+      errorMsg.textContent = "";
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            userLat = position.coords.latitude;
+            userLon = position.coords.longitude;
+            errorMsg.textContent = "✅ Location retrieved!";
+          },
+          (error) => {
+            errorMsg.textContent = "⚠️ Unable to get location. Please allow access.";
+          }
+        );
+      } else {
+        errorMsg.textContent = "Geolocation is not supported by your browser.";
+      }
+    }
+
+    function startExploring() {
+      const type = document.getElementById("placeType").value;
+      const errorMsg = document.getElementById("errorMsg");
+      errorMsg.textContent = "";
+
+      if (!type) {
+        errorMsg.textContent = "Please select a place type!";
+        return;
+      }
+
+      if (userLat && userLon) {
+        window.location.href = `/map?lat=${userLat}&lon=${userLon}&type=${type}`;
+      } else {
+        errorMsg.textContent = "Please click 'Use My Current Location' before exploring.";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Places - Dark Theme</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    h2 {
+      margin-top: 30px;
+      border-bottom: 2px solid #333;
+      padding-bottom: 5px;
+      color: #ffffff;
+    }
+
+    #favorites-list, #visited-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .place {
+      background: #1e1e1e;
+      padding: 15px;
+      border: 1px solid #333;
+      border-radius: 10px;
+      min-width: 200px;
+      max-width: 220px;
+      box-shadow: 0 4px 20px rgba(0, 255, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .place strong {
+      color: #00ffff;
+    }
+
+    .place button {
+      background: #ff1744;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s;
+    }
+
+    .place button:hover {
+      background: #ff4569;
+    }
+
+    #feedback {
+      margin-top: 40px;
+      padding: 20px;
+      background: #1e1e1e;
+      border-radius: 10px;
+      border: 1px solid #333;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    #feedback textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      background-color: #2a2a2a;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 6px;
+      font-size: 15px;
+      resize: vertical;
+    }
+
+    #feedback button {
+      margin-top: 15px;
+      background: #2979ff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    #feedback button:hover {
+      background: #5393ff;
+    }
+
+    #back-btn, #thankyou-btn {
+      position: fixed;
+      right: 20px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease;
+    }
+
+    #back-btn {
+      bottom: 20px;
+      background: #43a047;
+      color: white;
+    }
+
+    #thankyou-btn {
+      bottom: 70px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+    }
+
+    #thankyou-btn:hover, #back-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .stars {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .stars input[type="radio"] {
+      display: none;
+    }
+
+    .stars label {
+      font-size: 24px;
+      color: #555;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .stars input[type="radio"]:checked ~ label,
+    .stars label:hover,
+    .stars label:hover ~ label {
+      color: gold;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Favorite Places</h2>
+  <div id="favorites-list">Loading...</div>
+
+  <h2>Visited Places</h2>
+  <div id="visited-list">Loading visited places...</div>
+
+  <div id="feedback">
+    <h2>Feedback</h2>
+    <label for="rating">Rate Your Experience:</label>
+    <form onsubmit="feedback(event)">
+      <div class="stars">
+        <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+        <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+        <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+        <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+        <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+      </div>
+
+      <textarea id="feedback-text" placeholder="Tell us what you think..."></textarea>
+      <button type="submit">Submit Feedback</button>
+
+      <!-- <button onclick="submitFeedback()">Submit Feedback</button> -->
+    </form>
+  </div>
+
+  <button id="thankyou-btn" onclick="window.location.href='thankyou'">Finish & Go to Thank You Page</button>
+  
+
+  <script>
+  async function feedback(event) {
+    event.preventDefault();
+
+    const rating = document.querySelector('input[name="rating"]:checked');
+    const feedbackText = document.getElementById('feedback-text').value.trim();
+
+    if (!rating || !feedbackText) {
+      alert("Please select a rating and enter feedback.");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/feedback/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rating: rating.value,
+          feedback: feedbackText,
+          username: localStorage.getItem('username') || "Guest"
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("Thank you for your feedback!");
+        document.querySelector('form').reset(); // Reset the form
+      } else {
+        alert(result.error || "Failed to submit feedback.");
+      }
+    } catch (error) {
+      console.error("Feedback Error:", error);
+      alert("Server error. Please try again later.");
+    }
+  }
+
+
+    function loadFavorites() {
+      const container = document.getElementById('favorites-list');
+      let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+
+      if (favorites.length === 0) {
+        container.innerHTML = "<p>No favorite places yet.</p>";
+        return;
+      }
+
+      container.innerHTML = '';
+      favorites.forEach((place, index) => {
+        const div = document.createElement('div');
+        div.className = 'place';
+        div.innerHTML = `
+          <strong>${place.name}</strong>
+          <p>Lat: ${place.lat}</p>
+          <p>Lon: ${place.lon}</p>
+          <button onclick="removeFavorite(${index})">Remove from Favorites</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function removeFavorite(index) {
+      let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+      favorites.splice(index, 1);
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      loadFavorites();
+    }
+
+    function loadVisitedPlaces() {
+      const container = document.getElementById('visited-list');
+      const visited = JSON.parse(localStorage.getItem("visited") || "[]");
+      displayVisited(visited);
+    }
+
+    function displayVisited(visited) {
+      const container = document.getElementById('visited-list');
+      if (visited.length === 0) {
+        container.innerHTML = "<p>No visited places yet.</p>";
+        return;
+      }
+
+      container.innerHTML = '';
+      visited.slice().reverse().forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'place';
+        div.innerHTML = `
+          <strong>${v.name || 'Lat:'}</strong> ${v.name ? '' : v.lat} <strong>${v.name ? '' : 'Lon:'}</strong> ${v.name ? '' : v.lon}<br/>
+          <small>Visited at: ${v.time}</small>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function submitFeedback() {
+      const feedbackText = document.getElementById("feedback-text").value.trim();
+      const rating = document.querySelector('input[name="rating"]:checked');
+
+      if (!rating) {
+        alert("Please select a star rating.");
+        return;
+      }
+
+      if (!feedbackText) {
+        alert("Please enter your feedback.");
+        return;
+      }
+
+      alert(`Thank you for your ${rating.value}-star feedback!`);
+      document.getElementById("feedback-text").value = "";
+      document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
+    }
+
+    loadFavorites();
+    loadVisitedPlaces();
+  </script>
+</body>
+</html>
