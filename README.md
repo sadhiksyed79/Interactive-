@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="banner.jpg" alt="Interactive Route Planner for Guided Tourism Banner" width="800"/>
+</p>
+
+
 # 🗺 Interactive Route Planner for Guided Tourism  
 
 ## 📌 Project Overview  
