@@ -17,7 +17,6 @@ The *Interactive Route Planner for Guided Tourism* is a web-based application th
 ## 🛠 Tools & Technologies  
 - *Frontend:* HTML, CSS  
 - *Backend:* Python  
-- *Database:* MySQL  
 - *Visualization:* Interactive Maps / Route Guides  
 
 ---
@@ -29,8 +28,7 @@ To provide tourists and travel enthusiasts with a *personalized guided experienc
 
 ## 👩‍💻 My Role  
 - Designed the *frontend interface* using HTML & CSS.  
-- Developed the *backend logic* in Python.  
-- Integrated *database handling* with SQL.  
+- Developed the *backend logic* in Python.   
 - Implemented the *interactive route planner* feature.  
 
 ---
@@ -41,7 +39,6 @@ Interactive-Route-Planner/
 │── style.css         # Styling
 │── app.py            # Backend logic
 │── routes/           # Route planning logic
-│── database/         # SQL files
 │── assets/           # Images, icons, etc.
 │── README.md         # Documentation
 
